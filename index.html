@@ -834,7 +834,7 @@ let profile = null;
 let couple = null;
 let membership = null;
 let createdInviteCode = '';
-
+let passwordRecoveryMode = false;
 
 function $(id){
   return document.getElementById(id);
@@ -1189,7 +1189,7 @@ async function updatePassword(){
       '更新失敗：' + errorText(error)
     );
   }
-
+passwordRecoveryMode = false;
   await sb.auth.signOut();
 
   $('email').value = '';
@@ -1758,24 +1758,29 @@ sb.auth.onAuthStateChange(
       currentSession;
 
     if(
-      event === 'PASSWORD_RECOVERY' &&
-      currentSession
-    ){
-      show('passwordResetView');
-      return;
-    }
+  event === 'PASSWORD_RECOVERY' &&
+  currentSession
+){
+  passwordRecoveryMode = true;
+  show('passwordResetView');
+  return;
+}
 
     if(
-      event === 'SIGNED_IN' &&
-      currentSession
-    ){
+  event === 'SIGNED_IN' &&
+  currentSession
+){
 
-      setTimeout(
-        bootstrap,
-        0
-      );
+  if(passwordRecoveryMode){
+    return;
+  }
 
-    }
+  setTimeout(
+    bootstrap,
+    0
+  );
+
+}
 
   }
 );
