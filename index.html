@@ -943,7 +943,40 @@ async function signUp(){
     '正在建立帳號…',
     true
   );
+// 先檢查 Email 是否已經註冊
+try {
+  const checkResponse = await fetch(
+    'https://voybgizucenhlrhqymtv.supabase.co/functions/v1/check-email',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email })
+    }
+  );
 
+  if (!checkResponse.ok) {
+    throw new Error('Email check failed');
+  }
+
+  const checkResult = await checkResponse.json();
+
+  if (checkResult.registered === true) {
+    return message(
+      'registerNotice',
+      '此 Email 已經註冊過囉，請直接登入 ♡'
+    );
+  }
+
+} catch (err) {
+  console.error('檢查 Email 失敗：', err);
+
+  return message(
+    'registerNotice',
+    '目前無法檢查 Email，請稍後再試。'
+  );
+} 
   const {
     data,
     error
