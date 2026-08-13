@@ -577,7 +577,45 @@
 
 </section>
 
+<!-- 重設密碼 -->
+<section id="passwordResetView" class="screen hidden">
 
+  <div class="card">
+
+    <h2>設定新密碼 ♡</h2>
+
+    <p>
+      請輸入新的登入密碼。
+    </p>
+
+    <div id="passwordResetNotice"></div>
+
+    <label>新密碼</label>
+    <input
+      id="newPassword"
+      type="password"
+      autocomplete="new-password"
+      placeholder="至少 6 個字元"
+    >
+
+    <label>再次輸入新密碼</label>
+    <input
+      id="confirmNewPassword"
+      type="password"
+      autocomplete="new-password"
+      placeholder="再次輸入新密碼"
+    >
+
+    <button
+      class="btn btn-primary"
+      onclick="updatePassword()"
+    >
+      更新密碼
+    </button>
+
+  </div>
+
+</section>
 <!-- 建立 / 加入情侶 -->
 <section id="coupleSetupView" class="screen hidden">
 
@@ -811,12 +849,13 @@ function show(id){
     'welcomeView',
     'infoView',
     'authView',
-    'registerView',
-    'legalView',
-    'coupleSetupView',
-    'createdView',
-    'appView',
-    'ledgerView'
+   'registerView',
+'legalView',
+'passwordResetView',
+'coupleSetupView',
+'createdView',
+'appView',
+'ledgerView'
   ].forEach(view=>{
     $(view).classList.add('hidden');
   });
@@ -1110,7 +1149,60 @@ async function resetPassword(){
     true
   );
 }
+async function updatePassword(){
 
+  const newPassword =
+    $('newPassword').value;
+
+  const confirmNewPassword =
+    $('confirmNewPassword').value;
+
+  if(newPassword.length < 6){
+    return message(
+      'passwordResetNotice',
+      '新密碼至少需要 6 個字元。'
+    );
+  }
+
+  if(newPassword !== confirmNewPassword){
+    return message(
+      'passwordResetNotice',
+      '兩次輸入的密碼不一致。'
+    );
+  }
+
+  message(
+    'passwordResetNotice',
+    '正在更新密碼…',
+    true
+  );
+
+  const {
+    error
+  } = await sb.auth.updateUser({
+    password:newPassword
+  });
+
+  if(error){
+    return message(
+      'passwordResetNotice',
+      '更新失敗：' + errorText(error)
+    );
+  }
+
+  await sb.auth.signOut();
+
+  $('email').value = '';
+  $('password').value = '';
+
+  message(
+    'authNotice',
+    '密碼更新成功 ♡ 請使用新密碼重新登入。',
+    true
+  );
+
+  show('authView');
+}
 
 async function hasAcceptedLegal(uid){
 
@@ -1664,6 +1756,14 @@ sb.auth.onAuthStateChange(
 
     session =
       currentSession;
+
+    if(
+      event === 'PASSWORD_RECOVERY' &&
+      currentSession
+    ){
+      show('passwordResetView');
+      return;
+    }
 
     if(
       event === 'SIGNED_IN' &&
