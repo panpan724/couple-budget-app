@@ -1130,7 +1130,10 @@ async function resetPassword(){
   } = await sb.auth.resetPasswordForEmail(
     email,
     {
-      redirectTo:location.origin + location.pathname
+     redirectTo:
+  location.origin +
+  location.pathname +
+  '?recovery=1'
     }
   );
 
@@ -1190,6 +1193,11 @@ async function updatePassword(){
     );
   }
 passwordRecoveryMode = false;
+  window.history.replaceState(
+  {},
+  document.title,
+  location.origin + location.pathname
+);
   await sb.auth.signOut();
 
   $('email').value = '';
@@ -1633,7 +1641,26 @@ async function loadMembership(){
 
 
 async function bootstrap(){
+const isRecovery =
+  new URLSearchParams(window.location.search)
+    .get('recovery') === '1';
 
+if(isRecovery){
+  passwordRecoveryMode = true;
+
+  const {
+    data:{
+      session:recoverySession
+    }
+  } = await sb.auth.getSession();
+
+  session = recoverySession;
+
+  if(session){
+    show('passwordResetView');
+    return;
+  }
+}
   const {
     data:{
       session:currentSession
