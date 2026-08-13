@@ -699,9 +699,9 @@
 
     <div id="coupleInfo"></div>
 
-    <button class="btn btn-primary" onclick="alert('下一步我們就把完整記帳首頁接進來 ♡')">
-      開始記帳
-    </button>
+   <button class="btn btn-primary" onclick="openLedger()">
+  開始記帳
+</button>
 
     <button class="btn btn-white" onclick="signOut()">
       登出
@@ -710,7 +710,68 @@
   </div>
 
 </section>
+<!-- 真正的記帳 App -->
+<section id="ledgerView" class="screen hidden">
 
+  <div class="top">
+    <button class="back" onclick="show('appView')">
+      ‹ 返回
+    </button>
+  </div>
+
+  <div class="card">
+
+    <div class="heart" style="font-size:44px;margin-bottom:10px">
+      ♡
+    </div>
+
+    <h2>情侶小金庫</h2>
+
+    <p class="small">
+      兩個人的共同記帳空間
+    </p>
+
+    <div class="split">
+
+      <div class="setup-choice">
+        <div class="small">本月收入</div>
+        <h2 style="margin:6px 0 0;color:#5d9875">
+          $0
+        </h2>
+      </div>
+
+      <div class="setup-choice">
+        <div class="small">本月支出</div>
+        <h2 style="margin:6px 0 0;color:#bd6269">
+          $0
+        </h2>
+      </div>
+
+    </div>
+
+    <div class="setup-choice">
+
+      <h3 style="margin-top:0">
+        誰欠誰 ♡
+      </h3>
+
+      <p>
+        目前尚未有分攤紀錄。
+      </p>
+
+    </div>
+
+    <button class="btn btn-primary" onclick="alert('下一步接新增記帳功能 ♡')">
+      ＋ 新增一筆
+    </button>
+
+    <button class="btn btn-soft" onclick="alert('下一步接誰欠誰與結算功能 ♡')">
+      查看分攤與結算
+    </button>
+
+  </div>
+
+</section>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -740,7 +801,9 @@ let createdInviteCode = '';
 function $(id){
   return document.getElementById(id);
 }
-
+function openLedger(){
+  show('ledgerView');
+}
 
 function show(id){
 
@@ -752,7 +815,8 @@ function show(id){
     'legalView',
     'coupleSetupView',
     'createdView',
-    'appView'
+    'appView',
+    'ledgerView'
   ].forEach(view=>{
     $(view).classList.add('hidden');
   });
